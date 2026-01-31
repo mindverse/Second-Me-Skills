@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    {
+      "name": "secondme-skills",
+      "source": ".",
+      "description": "SecondMe API 集成开发工具集",
+      "version": "1.0.0"
+    }
+  ]
+}
