@@ -41,7 +41,7 @@ SecondMe API 的完整技术参考文档，供开发时查阅。
 ### 1. 添加市场
 
 ```bash
-/plugin marketplace add mindverse/secondme-skills
+/plugin marketplace add mindverse/Second-Me-Skills
 ```
 
 ### 2. 安装插件
