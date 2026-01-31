@@ -182,6 +182,27 @@ npm run build
 - TypeScript 类型错误
 - 导入路径错误
 
+### WebView OAuth 认证问题
+
+**问题：** 在 WebView 环境中（如移动端 App 内嵌页面、微信小程序等），OAuth state 验证可能失败，因为 WebView 与系统浏览器之间的存储不共享。
+
+**解决方案：** 使用宽松的 state 验证，验证失败时记录警告但继续处理登录流程。
+
+```tsx
+// 之前：验证失败直接拒绝
+if (!isValidState) {
+  return NextResponse.redirect('/?error=invalid_state');
+}
+
+// 之后：验证失败记录警告，继续处理
+if (!isValidState) {
+  console.warn('OAuth state 验证失败，可能是跨 WebView 场景');
+  // 继续处理，不阻止登录
+}
+```
+
+**注意：** 这种方式降低了 CSRF 防护，仅建议在可信的 WebView 环境中使用
+
 ---
 
 ## 开始
