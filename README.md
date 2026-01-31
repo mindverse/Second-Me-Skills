@@ -41,13 +41,13 @@ SecondMe API 的完整技术参考文档，供开发时查阅。
 ### 1. 添加市场
 
 ```bash
-/plugin marketplace add <your-github-username>/secondme-skills
+/plugin marketplace add mindverse/secondme-skills
 ```
 
 ### 2. 安装插件
 
 ```bash
-/plugin install secondme-skills@<your-github-username>-secondme-skills
+/plugin install secondme-skills@mindverse-secondme-skills
 ```
 
 ### 3. 使用 Skills
