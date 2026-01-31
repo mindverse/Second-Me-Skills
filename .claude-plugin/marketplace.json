@@ -1,8 +1,16 @@
 {
+  "name": "Second-Me-Skills",
+  "owner": {
+    "name": "mindverse",
+    "type": "organization"
+  },
   "plugins": [
     {
       "name": "secondme-skills",
-      "source": ".",
+      "source": {
+        "type": "local",
+        "path": "."
+      },
       "description": "SecondMe API 集成开发工具集",
       "version": "1.0.0"
     }
