@@ -140,6 +140,50 @@ SECONDME_REDIRECT_URI=http://localhost:3000/api/auth/callback
 
 ---
 
+## 常见问题与注意事项
+
+### CSS @import 顺序问题
+
+**问题：** 在 `globals.css` 中使用 `@import url(...)` 引入 Google Fonts 会导致构建失败。
+
+**错误信息：**
+```
+@import rules must precede all rules aside from @charset and @layer statements
+```
+
+**原因：** Tailwind CSS 的 `@import "tailwindcss"` 展开后生成大量规则，导致后续的 `@import url(...)` 不再是第一个。
+
+**正确做法：**
+
+1. **使用 `<link>` 标签（推荐）：** 在 `layout.tsx` 中引入
+   ```tsx
+   <head>
+     <link rel="preconnect" href="https://fonts.googleapis.com" />
+     <link href="https://fonts.googleapis.com/css2?family=..." rel="stylesheet" />
+   </head>
+   ```
+
+2. **使用 `next/font`（最佳实践）：**
+   ```tsx
+   import { Noto_Sans_SC } from 'next/font/google'
+   const notoSans = Noto_Sans_SC({ subsets: ['latin'], weight: ['400', '500'] })
+   ```
+
+### 构建验证
+
+**重要：** 每次完成代码修改后，必须运行以下命令验证构建：
+
+```bash
+npm run build
+```
+
+特别关注：
+- CSS 解析错误
+- TypeScript 类型错误
+- 导入路径错误
+
+---
+
 ## 开始
 
 现在请回答以下问题，我将根据你的需求开始构建项目：
