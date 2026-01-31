@@ -1,23 +1,20 @@
 {
   "name": "secondme-skills",
+  "description": "SecondMe API 集成开发工具集 - Next.js 全栈开发工作流和 API 参考",
   "owner": {
     "name": "mindverse",
     "email": "dev@mindverse.com"
-  },
-  "metadata": {
-    "description": "SecondMe API 集成开发工具集 - Next.js 全栈开发工作流和 API 参考",
-    "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "secondme-skills",
       "description": "SecondMe API 集成开发工具集",
+      "author": {
+        "name": "mindverse",
+        "email": "dev@mindverse.com"
+      },
       "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/secondme-nextjs",
-        "./skills/secondme-reference"
-      ]
+      "category": "development"
     }
   ]
 }
