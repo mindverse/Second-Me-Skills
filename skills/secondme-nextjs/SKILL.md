@@ -1,20 +1,85 @@
 ---
 name: secondme-nextjs
-description: 引导用户使用 Next.js 构建与 SecondMe API 集成的全栈项目
+description: 基于配置和需求生成 Next.js 项目，支持 --quick 快速模式跳过 PRD 阶段
 user-invocable: true
+argument-hint: [--quick]
 ---
 
-# SecondMe Next.js 全栈集成开发
+# SecondMe Next.js 项目生成
 
-## 概述
+基于 `/secondme-init` 的配置和 `/secondme-prd` 的需求定义，生成完整的 Next.js 项目。
 
-这是一个引导用户使用 Next.js 构建与 SecondMe API 集成的全栈项目的工作流 skill。采用 OAuth2 标准授权流程，确保安全可靠的用户授权体验。
+---
+
+## 前置条件检查
+
+### 1. 检查 state.json
+
+首先检查 `.secondme/state.json` 是否存在：
+
+- **不存在** → 提示：`请先运行 /secondme-init 初始化项目配置`
+- **存在** → 继续
+
+### 2. 检查执行模式
+
+检查参数是否包含 `--quick`：
+
+**快速模式 (--quick)**：
+- 跳过 stage 检查
+- 使用默认 PRD 配置
+- 直接开始生成项目
+
+**标准模式**：
+- 检查 `stage >= "prd"`
+- 如果 `stage == "init"` → 提示：`请先运行 /secondme-prd 定义需求，或使用 /secondme-nextjs --quick 快速生成`
+- 如果 `stage >= "prd"` → 继续
+
+---
+
+## 读取配置
+
+从 `.secondme/state.json` 读取：
+
+```javascript
+const state = {
+  app_name: "secondme-tinder",  // 用作项目目录名
+  modules: ["auth", "chat", "profile"],  // 已选模块
+  config: {
+    client_id: "71658da7-659c-414a-abdf-cb6472037fc2",
+    client_secret: "xxx",
+    redirect_uri: "http://localhost:3000/api/auth/callback",
+    redirect_uris: [...],
+    database_url: "postgresql://...",
+    allowed_scopes: [...]
+  },
+  api: {
+    base_url: "https://app.mindos.com/gate/lab",
+    oauth_url: "https://go.second.me/oauth/",
+    token_endpoint: "...",
+    access_token_ttl: 7200,
+    refresh_token_ttl: 2592000
+  },
+  docs: {
+    quickstart: "https://develop-docs.second.me/zh/docs",
+    oauth2: "...",
+    api_reference: "...",
+    errors: "..."
+  },
+  prd: {
+    summary: "应用概要",
+    features: ["功能1", "功能2"],
+    design_preference: "简约现代"
+  }
+}
+```
+
+**重要：** 所有 API 端点、文档链接均从 `state.api` 和 `state.docs` 读取，不要硬编码。
 
 ---
 
 ## 前端设计要求
 
-**重要：** 在构建前端界面时，必须使用 `/frontend-design` skill 来生成高质量的 UI 组件。
+**重要：** 在构建前端界面时，必须使用 `frontend-design:frontend-design` skill 来生成高质量的 UI 组件。
 
 设计原则：
 - **亮色主题**：仅使用亮色/浅色主题，不使用暗色/深色主题
@@ -28,103 +93,113 @@ user-invocable: true
 
 ---
 
-## 工作流程
+## 项目生成流程
 
-### 第一步：查阅官方文档
+### 1. 初始化 Next.js 项目
 
-在开始开发之前，请先查阅 SecondMe API 的官方文档，了解 API 的功能和使用方式。
+使用 `state.app_name` 作为项目目录名（默认 `secondme-app`）：
 
-**文档地址：** https://develop-docs.second.me/zh/docs
+```bash
+npx create-next-app@latest [app_name] --typescript --tailwind --app --src-dir --import-alias "@/*" --yes
+```
 
-**核心文档列表：**
+### 2. 安装依赖
 
-| 文档 | 地址 | 说明 |
-|------|------|------|
-| 快速入门 | https://develop-docs.second.me/zh/docs | API 概览和快速开始 |
-| 认证概述 | https://develop-docs.second.me/zh/docs/authentication | OAuth2 认证方式说明 |
-| OAuth2 指南 | https://develop-docs.second.me/zh/docs/authentication/oauth2 | OAuth2 授权流程详解 |
-| SecondMe API 参考 | https://develop-docs.second.me/zh/docs/api-reference/secondme | 完整的 API 端点文档 |
-| OAuth2 API 参考 | https://develop-docs.second.me/zh/docs/api-reference/oauth | OAuth2 相关 API 端点 |
-| 错误码参考 | https://develop-docs.second.me/zh/docs/errors | 错误码和处理方式 |
+```bash
+npm install prisma @prisma/client
+npx prisma init
+```
 
-**请先阅读文档，了解以下内容：**
-1. SecondMe API 提供哪些功能（用户信息、聊天、笔记等）
-2. OAuth2 授权流程的完整步骤
-3. API 的基础 URL 和请求格式
+### 3. 生成 .env.local
 
----
-
-### 第二步：注册应用并获取 OAuth2 凭证
-
-请按照以下步骤在 SecondMe 平台注册你的应用：
-
-1. **登录 SecondMe 开发者后台**
-2. **创建新应用**，获取：
-   - Client ID
-   - Client Secret
-3. **配置回调地址（Redirect URI）**
-   - 本地开发：`http://localhost:3000/api/auth/callback`
-   - 生产环境：`https://your-domain.com/api/auth/callback`
-
----
-
-### 第三步：提供配置信息
-
-请提供以下 OAuth2 凭证信息：
+从 `state.config` 和 `state.api` 生成环境变量：
 
 ```env
 # SecondMe OAuth2 配置
-SECONDME_CLIENT_ID=your_client_id
-SECONDME_CLIENT_SECRET=your_client_secret
-SECONDME_REDIRECT_URI=http://localhost:3000/api/auth/callback
+SECONDME_CLIENT_ID=[config.client_id]
+SECONDME_CLIENT_SECRET=[config.client_secret]
+SECONDME_REDIRECT_URI=[config.redirect_uri]
+
+# 数据库
+DATABASE_URL=[config.database_url]
+
+# SecondMe API（从 state.api 读取）
+SECONDME_API_BASE_URL=[api.base_url]
+SECONDME_OAUTH_URL=[api.oauth_url]
+SECONDME_TOKEN_ENDPOINT=[api.token_endpoint]
 ```
 
----
+### 4. 生成 Prisma Schema
 
-### 第四步：确定功能需求
+根据已选模块动态生成 `prisma/schema.prisma`。
 
-请描述你想要实现的产品功能。以下是 SecondMe API 支持的能力：
+#### auth 模块（必有）- User 表必须包含的字段
 
-**用户信息相关：**
-- 获取用户基础信息（昵称、头像等）
-- 获取用户兴趣标签（Shades）
-- 获取用户软记忆/知识库
+User 表必须包含 Token 相关字段用于存储和刷新用户凭证：
 
-**聊天相关：**
-- 与 SecondMe AI 进行流式对话
-- 获取历史会话列表
-- 获取会话消息记录
+```prisma
+model User {
+  id                String   @id @default(cuid())
+  secondmeUserId    String   @unique @map("secondme_user_id")
+  accessToken       String   @map("access_token")
+  refreshToken      String   @map("refresh_token")
+  tokenExpiresAt    DateTime @map("token_expires_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  // 其他字段根据模块需求自行添加
 
-**笔记相关：**
-- 添加笔记/记忆到用户的 SecondMe
+  @@map("users")
+}
+```
 
-**常见产品形态示例：**
-1. AI 智能聊天助手
-2. 个人画像可视化展示
-3. 知识库管理与探索工具
-4. 第三方应用集成入口
+#### 其他模块
 
----
+根据已选模块（profile、chat、note）的实际需求，自行设计相应的数据库表结构和关联关系。
 
-### 第五步：开始开发
+### 5. 生成代码
 
-收集到以上信息后，我将按以下流程帮你构建项目：
+根据已选模块生成对应代码：
 
-1. **初始化 Next.js 项目**（使用 App Router）
-2. **配置环境变量**
-3. **实现 OAuth2 认证流程**
-   - 授权跳转
-   - 回调处理
-   - Token 管理（存储、刷新）
-4. **开发后端 API 路由**
-   - 代理 SecondMe API
-   - 处理认证状态
-5. **使用 `/frontend-design` skill 构建前端界面**
-   - 简约现代的 UI 设计
-   - 紧密结合产品功能特性
-   - 良好的用户体验
-   - 所有界面文字使用中文
-6. **错误处理和边界情况**
+#### auth 模块
+
+| 文件 | 说明 |
+|------|------|
+| `src/app/api/auth/login/route.ts` | OAuth 登录跳转 |
+| `src/app/api/auth/callback/route.ts` | OAuth 回调处理 |
+| `src/app/api/auth/logout/route.ts` | 登出处理 |
+| `src/lib/auth.ts` | 认证工具函数 |
+| `src/components/LoginButton.tsx` | 登录按钮组件 |
+
+#### profile 模块
+
+| 文件 | 说明 |
+|------|------|
+| `src/app/api/user/info/route.ts` | 获取用户信息 |
+| `src/app/api/user/shades/route.ts` | 获取兴趣标签 |
+| `src/components/UserProfile.tsx` | 用户资料组件 |
+
+#### chat 模块
+
+| 文件 | 说明 |
+|------|------|
+| `src/app/api/chat/route.ts` | 流式聊天 API |
+| `src/app/api/sessions/route.ts` | 会话列表 API |
+| `src/components/ChatWindow.tsx` | 聊天界面组件 |
+
+#### note 模块
+
+| 文件 | 说明 |
+|------|------|
+| `src/app/api/note/route.ts` | 添加笔记 API |
+
+### 6. 更新 state.json
+
+```json
+{
+  "stage": "ready",
+  ...
+}
+```
 
 ---
 
@@ -133,10 +208,11 @@ SECONDME_REDIRECT_URI=http://localhost:3000/api/auth/callback
 - **框架：** Next.js 14+ (App Router)
 - **语言：** TypeScript
 - **样式：** Tailwind CSS
-- **前端设计：** 使用 `/frontend-design` skill 生成
+- **数据库 ORM：** Prisma
+- **前端设计：** 使用 `frontend-design:frontend-design` skill 生成
 - **API 调用：** fetch
 - **状态管理：** React hooks
-- **运行端口：** 必须使用 3000 端口，不允许切换其他端口
+- **运行端口：** 必须使用 3000 端口
 
 ---
 
@@ -205,10 +281,58 @@ if (!isValidState) {
 
 ---
 
-## 开始
+## 输出结果
 
-现在请回答以下问题，我将根据你的需求开始构建项目：
+```
+✅ Next.js 项目已生成！
 
-1. **你已经在 SecondMe 平台注册应用了吗？** 如果是，请提供 Client ID 和 Client Secret（可以使用占位符，稍后配置）
-2. **你想实现什么功能？** 请详细描述你的产品想法和核心功能
-3. **有没有特别的设计偏好？** 比如配色风格、布局方式等
+项目目录: ./[app_name]
+已生成模块: auth, chat, profile
+数据库: PostgreSQL
+
+启动步骤:
+1. cd [app_name]
+2. npm install
+3. npx prisma db push
+4. npm run dev
+
+项目将在 http://localhost:3000 启动
+```
+
+---
+
+## API 响应格式
+
+**重要：所有 SecondMe API 响应都遵循统一格式：**
+
+```json
+{
+  "code": 0,
+  "data": { ... }
+}
+```
+
+**前端代码必须正确提取数据：**
+
+```typescript
+// ✅ 正确写法
+const response = await fetch('/api/secondme/user/shades');
+const result = await response.json();
+if (result.code === 0) {
+  const shades = result.data.shades;
+  shades.map(item => ...)
+}
+```
+
+---
+
+## 官方文档
+
+从 `state.docs` 读取文档链接：
+
+| 文档 | 配置键 |
+|------|--------|
+| 快速入门 | `docs.quickstart` |
+| OAuth2 指南 | `docs.oauth2` |
+| API 参考 | `docs.api_reference` |
+| 错误码 | `docs.errors` |
