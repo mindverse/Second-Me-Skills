@@ -44,7 +44,7 @@ argument-hint: [--quick]
 
 执行 `secondme-init` 的完整流程：
 
-1. 收集 App Info 或手动输入凭证
+1. 收集 App Info 或手动输入凭证（如果用户没有凭证，引导前往 https://develop.second.me 注册并创建 App）
 2. 解析 Scopes，推断功能模块
 3. 收集数据库连接串
 4. 确认模块选择

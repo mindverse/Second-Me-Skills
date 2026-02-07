@@ -36,6 +36,24 @@ user-invocable: true
 
 ### 第二步：收集配置信息
 
+首先询问用户是否已有 SecondMe 应用的 Client ID 和 Client Secret。
+
+**如果用户没有凭证**，引导用户前往开发者平台注册：
+
+```
+📌 你还没有 SecondMe 应用凭证？请按以下步骤获取：
+
+1. 访问 SecondMe 开发者平台：https://develop.second.me
+2. 注册并登录账号
+3. 创建一个新的 App
+4. 创建完成后，你会获得 App Info（包含 Client ID、Client Secret 等信息）
+5. 将 App Info 复制粘贴到这里即可
+```
+
+提示用户获取到凭证后再继续。如果用户已有凭证，继续以下流程。
+
+---
+
 #### 方式一：解析 App Info 格式（推荐）
 
 如果用户提供了以下格式的信息，自动解析：
@@ -86,10 +104,12 @@ user-invocable: true
 
 2. **Client ID** (必填)
    - 提示：请输入 SecondMe 应用的 Client ID
+   - 如果用户没有，提示：请前往 https://develop.second.me 注册并创建 App 获取
    - 验证：非空
 
 3. **Client Secret** (必填)
    - 提示：请输入 SecondMe 应用的 Client Secret
+   - 如果用户没有，提示：请前往 https://develop.second.me 注册并创建 App 获取
    - 验证：非空
 
 4. **Redirect URI** (可选)
