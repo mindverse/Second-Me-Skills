@@ -57,6 +57,7 @@ https://go.second.me/oauth/
 | `user.info.softmemory` | 用户软记忆 |
 | `note.add` | 添加笔记 |
 | `chat` | 聊天功能 |
+| `chat` | 结构化动作判断（Act） |
 
 ---
 
@@ -99,7 +100,78 @@ if (result.code === 0) {
 | `/user/softmemory` | `result.data.list` | array |
 | `/chat/session/list` | `result.data.sessions` | array |
 | `/chat/session/messages` | `result.data.messages` | array |
+| `/act/stream` | SSE 流式 JSON（需拼接 delta） | SSE stream |
 | `/note/add` | `result.data.noteId` | number |
+
+---
+
+## Act API（结构化动作判断）
+
+Act API 是独立于 Chat API 的接口，约束模型仅输出合法 JSON 对象，适用于情感分析、意图分类等结构化决策场景。权限使用 `chat` scope。
+
+### 端点
+
+```
+POST /api/secondme/act/stream
+```
+
+### 请求参数
+
+| 参数 | 类型 | 必需 | 说明 |
+|------|------|------|------|
+| message | string | 是 | 用户消息内容 |
+| actionControl | string | 是 | 动作控制说明（20-8000 字符），定义 JSON 结构与判断规则 |
+| appId | string | 否 | 应用 ID |
+| sessionId | string | 否 | 会话 ID，不提供则自动生成 |
+| systemPrompt | string | 否 | 系统提示词，仅新会话首次有效 |
+
+### actionControl 示例
+
+```
+仅输出合法 JSON 对象，不要解释。
+输出结构：{"is_liked": boolean}。
+当用户明确表达喜欢或支持时 is_liked=true，否则 is_liked=false。
+```
+
+### 响应格式（SSE）
+
+```
+event: session
+data: {"sessionId": "labs_sess_xxx"}
+
+data: {"choices": [{"delta": {"content": "{\"is_liked\": true}"}}]}
+
+data: [DONE]
+```
+
+### 前端处理示例
+
+```typescript
+// 调用 Act API 进行结构化判断
+const response = await fetch('/api/secondme/act/stream', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    message: userMessage,
+    actionControl: '仅输出合法 JSON。结构：{"intent": "like"|"dislike"|"neutral"}。根据用户表达判断意图。信息不足时返回 {"intent": "neutral"}。'
+  })
+});
+
+// 拼接 SSE 流中的 delta content，最终 JSON.parse 得到结果
+```
+
+### Chat vs Act 使用场景
+
+| 场景 | 使用 API | 原因 |
+|------|---------|------|
+| 自由对话 | `/chat/stream` | 返回自然语言文本 |
+| 情感/意图判断 | `/act/stream` | 返回结构化 JSON |
+| 是/否决策 | `/act/stream` | 返回 `{"result": boolean}` |
+| 多分类判断 | `/act/stream` | 返回 `{"category": "..."}` |
+| 内容生成 | `/chat/stream` | 需要长文本输出 |
 
 ---
 

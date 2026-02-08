@@ -186,6 +186,13 @@ model User {
 | `src/app/api/sessions/route.ts` | 会话列表 API |
 | `src/components/ChatWindow.tsx` | 聊天界面组件 |
 
+#### act 模块
+
+| 文件 | 说明 |
+|------|------|
+| `src/app/api/act/route.ts` | 流式动作判断 API（结构化 JSON 输出） |
+| `src/lib/act.ts` | Act API 工具函数（发送 actionControl、解析 SSE JSON 结果） |
+
 #### note 模块
 
 | 文件 | 说明 |

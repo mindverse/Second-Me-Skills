@@ -114,6 +114,7 @@ user-invocable: true
 | `user.info.shades` | `profile` |
 | `user.info.softmemory` | `profile` |
 | `chat` | `chat` |
+| `chat` | `act` |
 | `note.add` | `note` |
 | `voice` | 记录但暂不生成代码 |
 
@@ -162,6 +163,7 @@ user-invocable: true
 | `auth` | OAuth 认证 | **必选**，自动包含 |
 | `profile` | 用户信息展示 | 可选 |
 | `chat` | 聊天功能 | 可选 |
+| `act` | 结构化动作判断（返回 JSON） | 可选，权限复用 `chat` scope |
 | `note` | 笔记功能 | 可选 |
 
 询问用户是否需要调整模块选择。
