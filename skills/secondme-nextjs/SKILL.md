@@ -42,7 +42,7 @@ argument-hint: [--quick]
 
 ```javascript
 const state = {
-  app_name: "secondme-tinder",  // 用作项目目录名
+  app_name: "secondme-tinder",  // 应用名称
   modules: ["auth", "chat", "profile"],  // 已选模块
   config: {
     client_id: "71658da7-659c-414a-abdf-cb6472037fc2",
@@ -97,10 +97,10 @@ const state = {
 
 ### 1. 初始化 Next.js 项目
 
-使用 `state.app_name` 作为项目目录名（默认 `secondme-app`）：
+在当前目录直接初始化 Next.js 项目：
 
 ```bash
-npx create-next-app@latest [app_name] --typescript --tailwind --app --src-dir --import-alias "@/*" --yes
+npx create-next-app@latest . --typescript --tailwind --app --src-dir --import-alias "@/*" --yes
 ```
 
 ### 2. 安装依赖
@@ -286,15 +286,13 @@ if (!isValidState) {
 ```
 ✅ Next.js 项目已生成！
 
-项目目录: ./[app_name]
 已生成模块: auth, chat, profile
 数据库: PostgreSQL
 
 启动步骤:
-1. cd [app_name]
-2. npm install
-3. npx prisma db push
-4. npm run dev
+1. npm install
+2. npx prisma db push
+3. npm run dev
 
 项目将在 http://localhost:3000 启动
 ```
