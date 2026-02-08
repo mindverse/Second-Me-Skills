@@ -175,6 +175,7 @@ model User {
   email             String?
   name              String?
   avatarUrl         String?  @map("avatar_url")
+  route             String?
 }
 ```
 
@@ -257,6 +258,7 @@ model User {
   email             String?
   name              String?
   avatarUrl         String?  @map("avatar_url")
+  route             String?
 
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")

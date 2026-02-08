@@ -94,7 +94,7 @@ if (result.code === 0) {
 
 | API | 数据路径 | 类型 |
 |-----|---------|------|
-| `/user/info` | `result.data` | object |
+| `/user/info` | `result.data` | object（含 email, name, avatarUrl, route 等字段） |
 | `/user/shades` | `result.data.shades` | array |
 | `/user/softmemory` | `result.data.list` | array |
 | `/chat/session/list` | `result.data.sessions` | array |
