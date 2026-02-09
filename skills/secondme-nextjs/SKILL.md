@@ -317,10 +317,14 @@ if (!isValidState) {
 }
 ```
 
+> **本地路由与上游 API 的关系：** Next.js 本地路由（如 `/api/secondme/user/shades`）作为代理层，
+> 将请求转发到上游 SecondMe API（`{state.api.base_url}/api/secondme/...`），并**透传上游的响应格式**。
+> 前端代码调用本地路由即可，无需直接访问上游 API。
+
 **前端代码必须正确提取数据：**
 
 ```typescript
-// ✅ 正确写法
+// ✅ 正确写法（调用 Next.js 本地路由，响应格式与上游一致）
 const response = await fetch('/api/secondme/user/shades');
 const result = await response.json();
 if (result.code === 0) {

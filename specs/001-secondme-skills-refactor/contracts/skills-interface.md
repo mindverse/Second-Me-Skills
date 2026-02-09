@@ -75,23 +75,30 @@ user-invocable: true
 ```markdown
 # SecondMe 集成项目
 
+## 应用信息
+
+- **App Name**: [app_name]
+- **Client ID**: [client_id 部分隐藏]
+
 ## API 文档
 
-开发时请参考以下官方文档：
+开发时请参考官方文档（从 `.secondme/state.json` 的 `docs` 字段读取）：
 
-| 文档 | 地址 |
-|------|------|
-| 快速入门 | https://develop-docs.second.me/zh/docs |
-| OAuth2 认证 | https://develop-docs.second.me/zh/docs/authentication/oauth2 |
-| API 参考 | https://develop-docs.second.me/zh/docs/api-reference/secondme |
-| 错误码 | https://develop-docs.second.me/zh/docs/errors |
+| 文档 | 配置键 |
+|------|--------|
+| 快速入门 | `docs.quickstart` |
+| OAuth2 认证 | `docs.oauth2` |
+| API 参考 | `docs.api_reference` |
+| 错误码 | `docs.errors` |
 
 ## 关键信息
 
-- API 基础 URL: `https://app.mindos.com/gate/lab`
-- OAuth 授权 URL: `https://go.second.me/oauth/`
+- API 基础 URL: [从 state.json api.base_url 读取]
+- OAuth 授权 URL: [从 state.json api.oauth_url 读取]
 - Access Token 有效期: 2 小时
 - Refresh Token 有效期: 30 天
+
+> 所有 API 端点配置请参考 `.secondme/state.json` 中的 `api` 和 `docs` 字段
 
 ## 已选模块
 
@@ -110,6 +117,8 @@ user-invocable: true
 | stage | 设为 "init" |
 | modules | 设为用户选择 |
 | config | 设为用户输入 |
+| api | 自动生成（base_url、oauth_url、token_endpoint、TTL 等） |
+| docs | 自动生成（quickstart、oauth2、api_reference、errors 链接） |
 
 ---
 
@@ -250,6 +259,7 @@ stage 不满足时:
 | profile | 用户信息 API、个人资料组件 |
 | chat | 聊天 API、Session 表、聊天界面 |
 | note | 笔记 API |
+| (通用) | `.env.local` 从 `state.config` 和 `state.api` 读取 OAuth、数据库及 API 端点配置 |
 
 ### 项目结构
 

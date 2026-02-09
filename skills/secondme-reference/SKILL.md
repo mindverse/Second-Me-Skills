@@ -75,13 +75,16 @@ https://go.second.me/oauth/
 **前端代码必须正确提取数据：**
 
 ```typescript
+// 注意：以下 /api/secondme/... 是 Next.js 本地路由（由 secondme-nextjs skill 生成），
+// 本地路由会代理请求到上游 SecondMe API，并透传上游的响应格式。
+
 // ❌ 错误写法 - 直接使用响应会导致 .map is not a function
-const response = await fetch('/api/secondme/user/shades');
+const response = await fetch('/api/secondme/user/shades');  // Next.js 本地路由
 const shades = await response.json();
 shades.map(item => ...)  // 错误！
 
 // ✅ 正确写法 - 提取 data 字段内的数据
-const response = await fetch('/api/secondme/user/shades');
+const response = await fetch('/api/secondme/user/shades');  // Next.js 本地路由
 const result = await response.json();
 if (result.code === 0) {
   const shades = result.data.shades;  // 正确！
@@ -93,15 +96,18 @@ if (result.code === 0) {
 
 ## 各 API 的数据路径
 
-| API | 数据路径 | 类型 |
-|-----|---------|------|
-| `/user/info` | `result.data` | object（含 email, name, avatarUrl, route 等字段） |
-| `/user/shades` | `result.data.shades` | array |
-| `/user/softmemory` | `result.data.list` | array |
-| `/chat/session/list` | `result.data.sessions` | array |
-| `/chat/session/messages` | `result.data.messages` | array |
-| `/act/stream` | SSE 流式 JSON（需拼接 delta） | SSE stream |
-| `/note/add` | `result.data.noteId` | number |
+> 以下路径均为上游 SecondMe API 路径，完整 URL = `{base_url}/api/secondme{path}`
+> 其中 `base_url` 来自 `state.api.base_url`（默认 `https://app.mindos.com/gate/lab`）
+
+| 上游 API 路径 | 数据路径 | 类型 |
+|--------------|---------|------|
+| `/api/secondme/user/info` | `result.data` | object（含 email, name, avatarUrl, route 等字段） |
+| `/api/secondme/user/shades` | `result.data.shades` | array |
+| `/api/secondme/user/softmemory` | `result.data.list` | array |
+| `/api/secondme/chat/session/list` | `result.data.sessions` | array |
+| `/api/secondme/chat/session/messages` | `result.data.messages` | array |
+| `/api/secondme/act/stream` | SSE 流式 JSON（需拼接 delta） | SSE stream |
+| `/api/secondme/note/add` | `result.data.noteId` | number |
 
 ---
 
@@ -109,10 +115,10 @@ if (result.code === 0) {
 
 Act API 是独立于 Chat API 的接口，约束模型仅输出合法 JSON 对象，适用于情感分析、意图分类等结构化决策场景。权限使用 `chat` scope。
 
-### 端点
+### 端点（上游 API）
 
 ```
-POST /api/secondme/act/stream
+POST {base_url}/api/secondme/act/stream
 ```
 
 ### 请求参数
@@ -147,7 +153,7 @@ data: [DONE]
 ### 前端处理示例
 
 ```typescript
-// 调用 Act API 进行结构化判断
+// 调用 Act API 进行结构化判断（通过 Next.js 本地路由代理到上游）
 const response = await fetch('/api/secondme/act/stream', {
   method: 'POST',
   headers: {

@@ -37,6 +37,23 @@ interface SecondMeState {
     allowed_scopes?: string[];      // App Info 中的权限列表
   };
 
+  // API 端点配置（由 init 自动生成，不需要用户输入）
+  api: {
+    base_url: string;                // "https://app.mindos.com/gate/lab"
+    oauth_url: string;               // "https://go.second.me/oauth/"
+    token_endpoint: string;          // base_url + "/api/oauth/token"
+    access_token_ttl: number;        // 7200（2 小时）
+    refresh_token_ttl: number;       // 2592000（30 天）
+  };
+
+  // 官方文档链接（由 init 自动生成）
+  docs: {
+    quickstart: string;
+    oauth2: string;
+    api_reference: string;
+    errors: string;
+  };
+
   // PRD 对话结果（可选）
   prd?: {
     summary: string;
@@ -78,6 +95,19 @@ type Module = "auth" | "profile" | "chat" | "note";
     ],
     "database_url": "postgresql://user:pass@localhost:5432/myapp",
     "allowed_scopes": ["user.info", "user.info.shades", "user.info.softmemory", "chat", "note.add", "voice"]
+  },
+  "api": {
+    "base_url": "https://app.mindos.com/gate/lab",
+    "oauth_url": "https://go.second.me/oauth/",
+    "token_endpoint": "https://app.mindos.com/gate/lab/api/oauth/token",
+    "access_token_ttl": 7200,
+    "refresh_token_ttl": 2592000
+  },
+  "docs": {
+    "quickstart": "https://develop-docs.second.me/zh/docs",
+    "oauth2": "https://develop-docs.second.me/zh/docs/authentication/oauth2",
+    "api_reference": "https://develop-docs.second.me/zh/docs/api-reference/secondme",
+    "errors": "https://develop-docs.second.me/zh/docs/errors"
   },
   "prd": {
     "summary": "AI 聊天助手应用",
@@ -301,6 +331,15 @@ model Session {
 | config.redirect_uris | URL 数组（可选） |
 | config.database_url | 有效数据库连接串格式 |
 | config.allowed_scopes | 字符串数组（可选） |
+| api.base_url | 有效 URL 格式 |
+| api.oauth_url | 有效 URL 格式 |
+| api.token_endpoint | 有效 URL 格式 |
+| api.access_token_ttl | 正整数（秒） |
+| api.refresh_token_ttl | 正整数（秒） |
+| docs.quickstart | 有效 URL 格式 |
+| docs.oauth2 | 有效 URL 格式 |
+| docs.api_reference | 有效 URL 格式 |
+| docs.errors | 有效 URL 格式 |
 
 ### 数据库连接串格式
 
