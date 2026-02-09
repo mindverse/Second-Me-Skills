@@ -4,60 +4,31 @@ SecondMe API 集成开发工具集 - 包含 Next.js 全栈开发工作流和 API
 
 ## 包含的 Skills
 
-### 1. `secondme-nextjs` - 主工作流
-
-引导用户使用 Next.js 构建与 SecondMe API 集成的全栈项目。
-
-**功能：**
-- 完整的开发工作流程指导（5 个步骤）
-- 前端设计规范和要求
-- 技术栈说明
-- OAuth2 认证流程集成
-
-**调用方式：**
-```
-/secondme-nextjs
-```
-
-### 2. `secondme-reference` - 技术参考
-
-SecondMe API 的完整技术参考文档，供开发时查阅。
-
-**包含内容：**
-- API 基础 URL
-- OAuth2 授权 URL 和流程
-- Token 有效期说明
-- 权限列表（Scopes）
-- API 响应格式与数据路径
-- 开发注意事项
-
-**调用方式：**
-```
-/secondme-reference
-```
+| Skill | 说明 |
+|-------|------|
+| `/secondme` | 一站式创建项目，依次执行初始化、需求定义、项目生成 |
+| `/secondme-init` | 初始化项目配置和功能模块选择 |
+| `/secondme-prd` | 通过对话定义产品需求 |
+| `/secondme-nextjs` | 基于配置生成 Next.js 全栈项目 |
+| `/secondme-reference` | SecondMe API 完整技术参考文档 |
 
 ## 安装方式
 
-### 1. 添加市场
+### 通过 skills.sh 安装（推荐）
 
 ```bash
-/plugin marketplace add mindverse/Second-Me-Skills
+npx skills add Mindverse/Second-Me-Skills
 ```
 
-### 2. 安装插件
+安装后即可直接使用：
 
 ```bash
-/plugin install secondme-skills@mindverse-secondme-skills
-```
-
-### 3. 使用 Skills
-
-```bash
-# 启动开发工作流
-/secondme-nextjs
-
-# 查看技术参考
-/secondme-reference
+/secondme              # 一站式创建项目
+/secondme --quick      # 快速模式（跳过 PRD）
+/secondme-init         # 仅初始化
+/secondme-prd          # 仅需求定义
+/secondme-nextjs       # 仅生成项目
+/secondme-reference    # 查看 API 参考
 ```
 
 ## 目录结构
@@ -65,14 +36,17 @@ SecondMe API 的完整技术参考文档，供开发时查阅。
 ```
 secondme-skills/
 ├── README.md                           # 本文档
-├── .claude-plugin/
-│   ├── plugin.json                     # 插件元信息
-│   └── marketplace.json                # 市场配置
 └── skills/
+    ├── secondme/
+    │   └── SKILL.md                    # 一站式工作流
+    ├── secondme-init/
+    │   └── SKILL.md                    # 项目初始化
+    ├── secondme-prd/
+    │   └── SKILL.md                    # 需求定义
     ├── secondme-nextjs/
-    │   └── SKILL.md                    # 主工作流 Skill
+    │   └── SKILL.md                    # Next.js 项目生成
     └── secondme-reference/
-        └── SKILL.md                    # 技术参考 Skill
+        └── SKILL.md                    # API 技术参考
 ```
 
 ## 相关链接
