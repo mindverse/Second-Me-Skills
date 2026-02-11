@@ -38,6 +38,121 @@ https://go.second.me/oauth/
 
 ---
 
+## 授权 URL 构造
+
+**重要：`oauth_url` 已包含完整路径，直接在后面拼接 `?` 和查询参数即可，不要追加 `/authorize` 等路径。**
+
+```typescript
+const OAUTH_URL = 'https://go.second.me/oauth/';
+
+const params = new URLSearchParams({
+  client_id: process.env.SECONDME_CLIENT_ID,
+  redirect_uri: process.env.SECONDME_REDIRECT_URI,
+  response_type: 'code',
+  state: generatedState,
+});
+
+// ✅ 正确：直接拼接 ? 和参数
+const authUrl = `${OAUTH_URL}?${params.toString()}`;
+// 结果: https://go.second.me/oauth/?client_id=...&redirect_uri=...
+
+// ❌ 错误：不要追加 /authorize 等路径
+// const authUrl = `${OAUTH_URL}/authorize?${params}`;
+// 会变成: https://go.second.me/oauth//authorize?... ❌
+```
+
+---
+
+## Token 交换（用授权码换 Token）
+
+### 端点
+
+```
+POST {base_url}/api/oauth/token/code
+```
+
+### 请求格式
+
+**Content-Type 必须是 `application/x-www-form-urlencoded`，不是 JSON。**
+
+```typescript
+const response = await fetch(`${API_BASE_URL}/api/oauth/token/code`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',  // 必须
+  },
+  body: new URLSearchParams({
+    grant_type: 'authorization_code',
+    code: authorizationCode,
+    redirect_uri: process.env.SECONDME_REDIRECT_URI,
+    client_id: process.env.SECONDME_CLIENT_ID,
+    client_secret: process.env.SECONDME_CLIENT_SECRET,
+  }),
+});
+```
+
+### 响应格式
+
+**响应遵循统一包装格式，字段使用 camelCase（不是 OAuth2 标准的 snake_case）：**
+
+```json
+{
+  "code": 0,
+  "data": {
+    "accessToken": "lba_at_xxxxx...",
+    "refreshToken": "lba_rt_xxxxx...",
+    "tokenType": "Bearer",
+    "expiresIn": 7200,
+    "scope": ["user.info", "chat"]
+  }
+}
+```
+
+### 响应处理
+
+```typescript
+const result = await response.json();
+
+// 必须检查 code 字段
+if (result.code !== 0 || !result.data) {
+  throw new Error(`Token exchange failed: ${result.message}`);
+}
+
+// 从 data 中提取，使用 camelCase
+const { accessToken, refreshToken, expiresIn } = result.data;
+```
+
+---
+
+## Token 刷新
+
+### 端点
+
+```
+POST {base_url}/api/oauth/token/refresh
+```
+
+### 请求格式
+
+```typescript
+const response = await fetch(`${API_BASE_URL}/api/oauth/token/refresh`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+  body: new URLSearchParams({
+    grant_type: 'refresh_token',
+    refresh_token: storedRefreshToken,
+    client_id: process.env.SECONDME_CLIENT_ID,
+    client_secret: process.env.SECONDME_CLIENT_SECRET,
+  }),
+});
+```
+
+响应格式与 Token 交换一致。
+
+---
+
 ## Token 有效期
 
 | Token 类型 | 前缀 | 有效期 |

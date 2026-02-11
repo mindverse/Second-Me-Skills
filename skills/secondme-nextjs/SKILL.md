@@ -55,7 +55,8 @@ const state = {
   api: {
     base_url: "https://app.mindos.com/gate/lab",
     oauth_url: "https://go.second.me/oauth/",
-    token_endpoint: "...",
+    token_endpoint: "https://app.mindos.com/gate/lab/api/oauth/token/code",
+    refresh_endpoint: "https://app.mindos.com/gate/lab/api/oauth/token/refresh",
     access_token_ttl: 7200,
     refresh_token_ttl: 2592000
   },
@@ -127,6 +128,7 @@ DATABASE_URL=[config.database_url]
 SECONDME_API_BASE_URL=[api.base_url]
 SECONDME_OAUTH_URL=[api.oauth_url]
 SECONDME_TOKEN_ENDPOINT=[api.token_endpoint]
+SECONDME_REFRESH_ENDPOINT=[api.refresh_endpoint]
 ```
 
 ### 4. 生成 Prisma Schema
